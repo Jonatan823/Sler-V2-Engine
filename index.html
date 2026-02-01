@@ -2,122 +2,99 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SLER - IDE LOGÍSTICO v2</title>
+    <title>SLER - OPERATIONAL DASHBOARD</title>
     <style>
-        :root { --bg: #1e1e1e; --panel: #2d2d2d; --text: #d4d4d4; --accent: #007acc; }
-        body { font-family: 'Segoe UI', monospace; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        :root { 
+            --bg: #0a0a0c; --panel: #16161a; --text: #a0a0a0; 
+            --accent: #007acc; --border: #2d2d33; --success: #4ec9b0; --warning: #dcdcaa; 
+        }
+        body { font-family: 'Segoe UI', 'Consolas', monospace; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Panel Lateral de Control */
-        #sidebar { width: 250px; background: var(--panel); border-right: 1px solid #444; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .status-box { border: 1px solid #555; padding: 10px; font-size: 11px; }
-        .status-on { color: #89d185; }
-
-        /* Área de Trabajo Principal */
-        #main-ide { flex: 1; display: flex; flex-direction: column; position: relative; }
-        #terminal { flex: 1; overflow-y: auto; padding: 20px; font-size: 14px; background: #161616; border-bottom: 1px solid #444; }
+        /* Dashboard Sidebar */
+        #sidebar { width: 300px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .module { background: #1e1e1e; border: 1px solid var(--border); padding: 12px; border-radius: 4px; }
+        .module-title { font-size: 10px; color: var(--accent); letter-spacing: 1.5px; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; }
         
-        /* Burbujas Estilo Logístico */
-        .log-entry { margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
-        .log-user { font-weight: bold; color: var(--accent); font-size: 12px; }
-        .log-text { margin-top: 4px; line-height: 1.4; }
+        /* Indicadores LED */
+        .status-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; margin-bottom: 5px; }
+        .led { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .led-on { background: var(--success); box-shadow: 0 0 5px var(--success); }
+        .led-wait { background: var(--warning); box-shadow: 0 0 5px var(--warning); }
 
-        /* Input de Comando */
-        .command-line { padding: 20px; background: var(--panel); display: flex; gap: 10px; }
-        textarea { flex: 1; background: #3c3c3c; border: 1px solid #555; color: white; padding: 10px; resize: none; height: 50px; }
-        button { background: var(--accent); color: white; border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
+        /* Main Display */
+        #main-display { flex: 1; display: flex; flex-direction: column; background: #0d0d0f; }
+        #data-stream { flex: 1; overflow-y: auto; padding: 20px; font-family: 'Consolas', monospace; font-size: 13px; }
+        
+        /* Matrix Data Style */
+        .data-packet { border-bottom: 1px solid #1a1a1e; padding: 10px 0; display: grid; grid-template-columns: 100px 120px 1fr; gap: 10px; animation: slideIn 0.2s ease-out; }
+        .packet-timestamp { color: #569cd6; }
+        .packet-id { color: var(--success); font-weight: bold; }
+        .packet-content { color: #d4d4d4; }
 
-        /* Pantalla de Acceso */
-        #auth-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        input { background: #3c3c3c; border: 1px solid var(--accent); color: white; padding: 10px; text-align: center; width: 200px; margin-bottom: 10px; }
+        /* Operation Console */
+        .console-footer { padding: 15px; background: var(--panel); border-top: 2px solid var(--accent); }
+        .input-group { display: flex; gap: 10px; background: #000; padding: 5px; border: 1px solid var(--border); }
+        input[type="text"] { flex: 1; background: transparent; border: none; color: var(--success); padding: 10px; font-family: 'Consolas'; outline: none; }
+        .btn-execute { background: var(--accent); color: white; border: none; padding: 0 25px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: bold; }
+
+        /* Overlay */
+        #security-gate { position: fixed; inset: 0; background: #050505; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .gate-card { border: 1px solid var(--accent); padding: 30px; text-align: center; background: var(--panel); }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="auth-overlay">
-        <h2>SLER LOGISTIC INTERFACE</h2>
-        <input type="text" id="nick" placeholder="NICKNAME">
-        <button id="btn-entrar" style="height: 40px;">AUTORIZAR INGRESO</button>
-    </div>
-
-    <div id="sidebar">
-        <h3>CONTROLES</h3>
-        <div class="status-box">
-            <div>ESTADO: <span class="status-on">ONLINE</span></div>
-            <div>MOTOR V2: <span id="motor-status">ESPERANDO...</span></div>
-            <div>PROPIEDAD: Ribot Jonatan</div>
-        </div>
-        <div style="font-size: 10px; color: #888;">Protocolo de No Conflicto v1.0 activado.</div>
-    </div>
-
-    <div id="main-ide">
-        <div id="terminal"></div>
-        <div class="command-line">
-            <textarea id="texto" placeholder="Escribir cadena para procesar..."></textarea>
-            <button id="btn-enviar">EJECUTAR</button>
+    <div id="security-gate">
+        <div class="gate-card">
+            <div style="color: var(--accent); font-size: 20px; margin-bottom: 20px;">SYSTEM AUTHORIZATION REQUIRED</div>
+            <input type="text" id="access-id" placeholder="OPERATOR ID" style="background: #000; border: 1px solid #333; color: #fff; padding: 10px; margin-bottom: 15px; display: block; width: 250px;">
+            <button onclick="authorize()" style="width: 100%; padding: 10px; background: var(--accent); border: none; color: white; cursor: pointer;">INITIALIZE DASHBOARD</button>
         </div>
     </div>
+
+    <aside id="sidebar">
+        <div class="module">
+            <div class="module-title">System Status</div>
+            <div class="status-row"><span>UPLINK:</span> <span><span class="led led-on"></span>ESTABLISHED</span></div>
+            <div class="status-row"><span>MOTOR V2:</span> <span><span class="led led-wait" id="led-motor"></span>SYNCING</span></div>
+            <div class="status-row"><span>LOGS:</span> <span id="log-count">0</span> PKTS</div>
+        </div>
+
+        <div class="module">
+            <div class="module-title">Ownership Metadata</div>
+            <div style="font-size: 11px;">
+                PROPIETARIO: <span style="color: white;">RIBOT JONATAN</span><br>
+                LICENSE: <span style="color: var(--warning);">REGISTERED 2025</span><br>
+                REGION: <span style="color: white;">BELL VILLE, AR</span>
+            </div>
+        </div>
+
+        <div class="module" style="margin-top: auto; opacity: 0.6;">
+            <div class="module-title">Security Protocol</div>
+            <div style="font-size: 9px; line-height: 1.2;">
+                AES-256 ENCRYPTION ACTIVE<br>
+                NO CONFLICT MODE: ON<br>
+                SLER RECIPROCAL PROTOCOL V2
+            </div>
+        </div>
+    </aside>
+
+    <main id="main-display">
+        <div id="data-stream">
+            </div>
+        <footer class="console-footer">
+            <div class="input-group">
+                <input type="text" id="cmd-input" placeholder="READY FOR COMMAND INPUT...">
+                <button class="btn-execute" onclick="executeCommand()">Execute</button>
+            </div>
+        </footer>
+    </main>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        var firebaseConfig = {
-            apiKey: "AIzaSyD5ITa76Xc7mmihQPC2AUCHQFStii4NAUg",
-            authDomain: "sler-chat-lab.firebaseapp.com",
-            databaseURL: "https://sler-chat-lab-default-rtdb.firebaseio.com",
-            projectId: "sler-chat-lab",
-            storageBucket: "sler-chat-lab.firebasestorage.app",
-            messagingSenderId: "594954603335",
-            appId: "1:594954603335:web:d332aa211e8ecce5521a62"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        var db = firebase.database();
-
-        // 1. PROTOCOLO DE NO CONFLICTO (Simulación de Permiso)
-        db.ref('sistema/motor_v2').set({
-            permiso: "AUTORIZADO",
-            propietario: "Ribot Jonatan",
-            timestamp: Date.now()
-        });
-
-        // UI Elements
-        var btnEntrar = document.getElementById('btn-entrar');
-        var btnEnviar = document.getElementById('btn-enviar');
-        var authOverlay = document.getElementById('auth-overlay');
-        var nickInput = document.getElementById('nick');
-        var textoInput = document.getElementById('texto');
-        var terminal = document.getElementById('terminal');
-
-        btnEntrar.onclick = function() {
-            if (nickInput.value.trim() !== "") {
-                authOverlay.style.display = 'none';
-                document.getElementById('motor-status').innerText = "AUTORIZADO";
-                document.getElementById('motor-status').className = "status-on";
-            }
-        };
-
-        btnEnviar.onclick = function() {
-            var msj = textoInput.value.trim();
-            if (msj !== "") {
-                db.ref('mensajes').push({
-                    usuario: nickInput.value,
-                    contenido: msj,
-                    timestamp: Date.now()
-                });
-                textoInput.value = "";
-            }
-        };
-
-        // Escucha en tiempo real
-        db.ref('mensajes').on('child_added', function(data) {
-            var msg = data.val();
-            var div = document.createElement('div');
-            div.className = 'log-entry';
-            div.innerHTML = '<div class="log-user">[' + msg.usuario + ']</div><div class="log-text">' + msg.contenido + '</div>';
-            terminal.appendChild(div);
-            terminal.scrollTop = terminal.scrollHeight;
-        });
-    </script>
-</body>
-</html>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5ITa76Xc7mmihQPC2AUCHQFStii4NA
