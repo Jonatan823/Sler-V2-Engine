@@ -1,155 +1,46 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>SLER - OPERATIONAL DASHBOARD</title>
-    <style>
-        :root { 
-            --bg: #0a0a0c; --panel: #16161a; --text: #a0a0a0; 
-            --accent: #007acc; --border: #2d2d33; --success: #4ec9b0; --warning: #dcdcaa; 
-        }
-        body { font-family: 'Consolas', monospace; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+<div id="security-gate" style="position: fixed; inset: 0; background: #050505; z-index: 10000; display: flex; align-items: center; justify-content: center;">
+    <div class="gate-card" style="border: 1px solid #007acc; padding: 40px; text-align: center; background: #16161a;">
+        <div style="color: #007acc; font-size: 18px; margin-bottom: 25px; letter-spacing: 2px;">SLER MOTOR V2 - PRIVATE ACCESS</div>
         
-        /* Sidebar */
-        #sidebar { width: 300px; background: var(--panel); border-right: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .module { background: #1e1e1e; border: 1px solid var(--border); padding: 12px; border-radius: 4px; }
-        .module-title { font-size: 10px; color: var(--accent); letter-spacing: 1.5px; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; }
+        <input type="password" id="access-pass" placeholder="ENTER PRIVATE KEY" 
+               style="background: #000; border: 1px solid #333; color: #4ec9b0; padding: 12px; margin-bottom: 10px; display: block; width: 280px; text-align: center; font-family: 'Consolas';">
         
-        /* Status Indicators */
-        .status-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; margin-bottom: 5px; }
-        .led { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .led-on { background: var(--success); box-shadow: 0 0 5px var(--success); }
-        .led-off { background: #333; }
-
-        /* Main Display */
-        #main-display { flex: 1; display: flex; flex-direction: column; background: #0d0d0f; }
-        #data-stream { flex: 1; overflow-y: auto; padding: 20px; font-size: 13px; }
+        <button id="btn-login" style="width: 100%; padding: 12px; background: #007acc; border: none; color: white; cursor: pointer; font-weight: bold; font-family: 'Consolas';">AUTHORIZE INITIALIZATION</button>
         
-        .data-packet { border-bottom: 1px solid #1a1a1e; padding: 10px 0; display: grid; grid-template-columns: 100px 120px 1fr; gap: 10px; }
-        .packet-timestamp { color: #569cd6; }
-        .packet-id { color: var(--success); font-weight: bold; }
-
-        /* Console */
-        .console-footer { padding: 15px; background: var(--panel); border-top: 1px solid var(--accent); }
-        .input-group { display: flex; gap: 10px; background: #000; padding: 5px; border: 1px solid var(--border); }
-        input[type="text"] { flex: 1; background: transparent; border: none; color: var(--success); padding: 10px; font-family: 'Consolas'; outline: none; }
-        .btn-execute { background: var(--accent); color: white; border: none; padding: 0 25px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: bold; }
-
-        /* Login Gate (Captura 1227) */
-        #security-gate { position: fixed; inset: 0; background: #050505; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .gate-card { border: 1px solid var(--accent); padding: 40px; text-align: center; background: var(--panel); box-shadow: 0 0 20px rgba(0,122,204,0.2); }
-    </style>
-</head>
-<body>
-
-    <div id="security-gate">
-        <div class="gate-card">
-            <div style="color: var(--accent); font-size: 18px; margin-bottom: 25px; letter-spacing: 2px;">SYSTEM AUTHORIZATION REQUIRED</div>
-            <input type="text" id="access-id" placeholder="OPERATOR ID" style="background: #000; border: 1px solid #333; color: #fff; padding: 12px; margin-bottom: 20px; display: block; width: 280px; text-align: center; font-family: 'Consolas';">
-            <button id="btn-authorize" style="width: 100%; padding: 12px; background: var(--accent); border: none; color: white; cursor: pointer; font-weight: bold; font-family: 'Consolas';">INITIALIZE DASHBOARD</button>
+        <div id="recovery-zone" style="margin-top: 20px; display: none;">
+            <p style="font-size: 10px; color: #666;">¿Olvidaste la clave?</p>
+            <button onclick="enviarRecordatorio()" style="background: none; border: none; color: #569cd6; cursor: pointer; font-size: 11px; text-decoration: underline;">Enviar recordatorio al e-mail de registro</button>
         </div>
     </div>
+</div>
 
-    <aside id="sidebar">
-        <div class="module">
-            <div class="module-title">System Status</div>
-            <div class="status-row"><span>UPLINK:</span> <span><span class="led led-on"></span>ESTABLISHED</span></div>
-            <div class="status-row"><span>MOTOR V2:</span> <span><span class="led led-off" id="led-motor"></span>SYNCING</span></div>
-            <div class="status-row"><span>PACKETS:</span> <span id="log-count">0</span></div>
-        </div>
+<script>
+    // Configuración de la clave maestra
+    const MASTER_KEY = "joniclapton";
 
-        <div class="module">
-            <div class="module-title">Ownership Metadata</div>
-            <div style="font-size: 11px; line-height: 1.6;">
-                PROPIETARIO: <span style="color: white;">RIBOT JONATAN</span><br>
-                LICENSE: <span style="color: var(--warning);">REGISTERED 2025</span><br>
-                REGION: <span style="color: white;">BELL VILLE, AR</span>
-            </div>
-        </div>
-    </aside>
-
-    <main id="main-display">
-        <div id="data-stream"></div>
-        <footer class="console-footer">
-            <div class="input-group">
-                <input type="text" id="cmd-input" placeholder="AWAITING COMMAND...">
-                <button class="btn-execute" id="btn-execute">Execute</button>
-            </div>
-        </footer>
-    </main>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyD5ITa76Xc7mmihQPC2AUCHQFStii4NAUg",
-            authDomain: "sler-chat-lab.firebaseapp.com",
-            databaseURL: "https://sler-chat-lab-default-rtdb.firebaseio.com",
-            projectId: "sler-chat-lab",
-            storageBucket: "sler-chat-lab.firebasestorage.app",
-            messagingSenderId: "594954603335",
-            appId: "1:594954603335:web:d332aa211e8ecce5521a62"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    document.getElementById('btn-login').onclick = function() {
+        const passInput = document.getElementById('access-pass').value;
         
-        let operatorName = "";
-        let packetCount = 0;
+        if(passInput === MASTER_KEY) {
+            document.getElementById('security-gate').style.display = 'none';
+            // Iniciamos el motor
+            initMotor(); 
+        } else {
+            alert("ACCESO DENEGADO: Credencial Inválida.");
+            document.getElementById('recovery-zone').style.display = 'block';
+        }
+    };
 
-        // --- SOLUCIÓN AL INGRESO (Captura 1227) ---
-        document.getElementById('btn-authorize').onclick = function() {
-            const idInput = document.getElementById('access-id').value.trim();
-            if(idInput !== "") {
-                operatorName = idInput;
-                document.getElementById('security-gate').style.display = 'none';
-                document.getElementById('led-motor').className = "led led-on";
-                
-                // Registro de auditoría en el Punto B
-                db.ref('sistema/accesos').push({
-                    operador: operatorName,
-                    timestamp: Date.now(),
-                    status: "AUTHORIZED"
-                });
-            } else {
-                alert("Identificador requerido.");
-            }
-        };
-
-        // --- EJECUCIÓN DE DATOS ---
-        document.getElementById('btn-execute').onclick = function() {
-            const input = document.getElementById('cmd-input');
-            if(input.value.trim() !== "") {
-                db.ref('mensajes').push({
-                    usuario: operatorName,
-                    contenido: input.value,
-                    timestamp: Date.now()
-                });
-                input.value = "";
-            }
-        };
-
-        // --- STREAM EN TIEMPO REAL ---
-        db.ref('mensajes').on('child_added', (snap) => {
-            const data = snap.val();
-            packetCount++;
-            document.getElementById('log-count').innerText = packetCount;
-            
-            const stream = document.getElementById('data-stream');
-            const row = document.createElement('div');
-            row.className = 'data-packet';
-            const time = new Date(data.timestamp).toLocaleTimeString();
-            
-            row.innerHTML = `
-                <div class="packet-timestamp">[${time}]</div>
-                <div class="packet-id">OP_${data.usuario.toUpperCase().slice(0,3)}</div>
-                <div class="packet-content">${data.contenido}</div>
-            `;
-            
-            stream.appendChild(row);
-            stream.scrollTop = stream.scrollHeight;
+    function enviarRecordatorio() {
+        // Aquí conectamos con Firebase Auth para el envío de mail
+        // Por ahora simulamos el log en consola hasta configurar el SMTP
+        console.log("Protocolo de recuperación activado para: Ribot Jonatan");
+        alert("Se ha enviado una solicitud de recuperación a tu e-mail registrado.");
+        
+        // Registro de intento fallido en Firebase para tu control
+        db.ref('sistema/alertas_seguridad').push({
+            evento: "FALLO_LOGIN",
+            timestamp: Date.now()
         });
-    </script>
-</body>
-</html>
+    }
+</script>
