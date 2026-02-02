@@ -40,6 +40,26 @@
             OWNER: RIBOT JONATAN<br>
             IP: REGISTERED 2025
         </div>
+        <div class="module" style="border-top: 2px solid #dcdcaa; margin-top: 15px; background: #1e1e1e; padding: 10px; border-radius: 4px;">
+    <div class="module-title" style="color: #dcdcaa; font-size: 10px; font-weight: bold; margin-bottom: 8px;">AI BINDING PROTOCOL (SLER-B)</div>
+    
+    <div class="status-row" style="display: flex; justify-content: space-between; font-size: 10px; color: #a0a0a0;">
+        <span>VARIABLES EXIGIDAS:</span> 
+        <span style="color: #4ec9b0;">ACTIVE [4]</span>
+    </div>
+    
+    <div id="variables-list" style="font-size: 9px; color: #666; margin: 5px 0; line-height: 1.4;">
+        • AUTH_ID: MANDATORY<br>
+        • SYLLABLE_INTEGRITY: STRICT<br>
+        • RECIPROCAL_FLOW: ENABLED<br>
+        • IP_CLAIM_2025: VERIFIED
+    </div>
+
+    <div style="margin-top: 10px; background: #000; padding: 8px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 9px; color: #dcdcaa;">EXTERNAL REQUESTS:</span>
+        <span id="ext-requests-count" style="color: #dcdcaa; font-weight: bold; font-family: 'Consolas'; font-size: 14px;">0</span>
+    </div>
+</div>
     </aside>
 
     <main id="main-display">
@@ -107,6 +127,32 @@
                 document.getElementById('data-stream').scrollTop = document.getElementById('data-stream').scrollHeight;
             });
         }
+        // --- LÓGICA DE AUDITORÍA EXTERNA ---
+let requestCounter = 0;
+
+function registrarSolicitudExterna(tipo = "SYNC") {
+    requestCounter++;
+    const counterElement = document.getElementById('ext-requests-count');
+    if(counterElement) {
+        counterElement.innerText = requestCounter;
+        // Animación de pulso para el contador
+        counterElement.style.textShadow = "0 0 10px #dcdcaa";
+        setTimeout(() => counterElement.style.textShadow = "none", 500);
+    }
+    
+    // Opcional: Registrar en Firebase para tu historial de paper académico
+    db.ref('sistema/auditoria_ia').push({
+        tipo_solicitud: tipo,
+        timestamp: Date.now(),
+        protocolo: "SLER-B_BINDING"
+    });
+}
+
+// Llamamos a la función cada vez que se carga un mensaje (simulando tráfico de IA)
+db.ref('mensajes').on('child_added', () => {
+    registrarSolicitudExterna("DATA_FETCH");
+});
     </script>
 </body>
 </html>
+
