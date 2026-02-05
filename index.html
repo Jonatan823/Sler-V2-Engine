@@ -15,6 +15,9 @@
             --success: #4ec9b0; 
             --text: #d4d4d4; 
         }
+        
+        * { box-sizing: border-box; }
+
         body { 
             font-family: 'Consolas', 'Courier New', monospace; 
             background: var(--bg); 
@@ -23,15 +26,17 @@
             display: flex; 
             flex-direction: column;
             height: 100vh; 
+            overflow: hidden;
         }
 
-        /* Monitor de Datos */
-        .main-content {
+        /* Monitor de Datos (Área de Captura) */
+        #data-stream {
             flex: 1;
             padding: 30px;
             overflow-y: auto;
             background: var(--bg);
-            line-height: 1.6;
+            border: 1px solid #222;
+            margin: 10px;
         }
 
         .data-line { 
@@ -40,34 +45,119 @@
             padding-left: 15px;
             white-space: pre-wrap;
             word-break: break-all;
+            color: var(--success);
         }
 
         /* Consola Inferior */
         .footer-console {
             display: flex;
             gap: 12px;
-            padding: 20px;
+            padding: 15px;
             background: var(--panel);
-            border-top: 1px solid #222;
+            border-top: 1px solid #333;
         }
 
-        input {
+        #cmd-input {
             flex: 1;
             background: #000;
-            color: var(--success);
-            border: 1px solid #333;
+            color: white;
+            border: 1px solid #444;
             padding: 12px;
             font-family: inherit;
             outline: none;
         }
 
         button {
-            padding: 10px 25px;
+            padding: 10px 20px;
             border: none;
             cursor: pointer;
             font-weight: bold;
             transition: 0.2s;
+            text-transform: uppercase;
         }
 
         .btn-exec { background: var(--accent); color: white; }
-        .btn-
+        .btn-export { background: var(--success); color: black; }
+        button:hover { filter: brightness(1.2); }
+
+        .status-bar {
+            font-size: 10px;
+            padding: 5px 15px;
+            background: #000;
+            color: #555;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="data-stream">
+        <div class="data-line">[SISTEMA] NODO LOGÍSTICO ONLINE - ESPERANDO ENTRADA...</div>
+    </div>
+
+    <div class="footer-console">
+        <input type="text" id="cmd-input" placeholder="Comando de entrada..." onkeypress="if(event.key==='Enter') procesarSLER()">
+        <button onclick="procesarSLER()" class="btn-exec">EXECUTE</button>
+        <button onclick="generarSnapshotSLER()" class="btn-export">EXPORTAR PNG</button>
+    </div>
+
+    <div class="status-bar">IP REGISTERED 2025 - RIBOT JONATAN | SLER ENGINE V2</div>
+
+    <script>
+        // --- 1. PUERTO DE ESCUCHA (RECEPTOR IA) ---
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pedidoIA = urlParams.get('ia_input');
+            
+            if (pedidoIA) {
+                const input = document.getElementById('cmd-input');
+                input.value = decodeURIComponent(pedidoIA);
+                
+                // Procesamiento automático al recibir datos externos
+                setTimeout(() => {
+                    procesarSLER();
+                }, 500);
+            }
+        };
+
+        // --- 2. LÓGICA DE PROCESAMIENTO ---
+        function procesarSLER() {
+            const input = document.getElementById('cmd-input');
+            const stream = document.getElementById('data-stream');
+            
+            if (input.value.trim() !== "") {
+                const newLine = document.createElement('div');
+                newLine.className = 'data-line';
+                
+                // Registro de tiempo y salida de datos
+                const timestamp = new Date().toLocaleTimeString();
+                newLine.textContent = `[ESTABLE] ${timestamp}: ${input.value}`;
+                
+                stream.appendChild(newLine);
+                input.value = ""; // Limpiar consola
+                stream.scrollTop = stream.scrollHeight; // Auto-scroll
+            }
+        }
+
+        // --- 3. APLANADO A IMAGEN (CANVAS) ---
+        function generarSnapshotSLER() {
+            const areaCaptura = document.getElementById('data-stream');
+            
+            console.log("Nodo: Iniciando generación de imagen estable...");
+            
+            html2canvas(areaCaptura, {
+                backgroundColor: "#0a0a0c",
+                scale: 2, // Doble resolución para nitidez foveal
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `SLER_V2_ESTABLE_${Date.now()}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            }).catch(err => {
+                console.error("Fallo en el motor de captura:", err);
+            });
+        }
+    </script>
+</body>
+</html>
