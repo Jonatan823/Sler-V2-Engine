@@ -29,23 +29,24 @@
             overflow: hidden;
         }
 
-        /* Monitor de Datos (Área de Captura) */
+        /* Monitor de Datos (Área de Captura de Imagen) */
         #data-stream {
             flex: 1;
-            padding: 30px;
+            padding: 40px;
             overflow-y: auto;
             background: var(--bg);
-            border: 1px solid #222;
+            border: 1px solid #1a1a1e;
             margin: 10px;
         }
 
         .data-line { 
-            margin-bottom: 8px; 
+            margin-bottom: 12px; 
             border-left: 3px solid var(--accent); 
             padding-left: 15px;
             white-space: pre-wrap;
             word-break: break-all;
             color: var(--success);
+            font-size: 18px; /* Tamaño optimizado foveal */
         }
 
         /* Consola Inferior */
@@ -92,7 +93,7 @@
 <body>
 
     <div id="data-stream">
-        <div class="data-line">[SISTEMA] NODO LOGÍSTICO ONLINE - ESPERANDO ENTRADA...</div>
+        <div class="data-line">[SISTEMA] NODO LOGÍSTICO ONLINE - IP REGISTERED 2025</div>
     </div>
 
     <div class="footer-console">
@@ -101,19 +102,21 @@
         <button onclick="generarSnapshotSLER()" class="btn-export">EXPORTAR PNG</button>
     </div>
 
-    <div class="status-bar">IP REGISTERED 2025 - RIBOT JONATAN | SLER ENGINE V2</div>
+    <div class="status-bar">RIBOT JONATAN | SLER ENGINE V2 | BELL VILLE, CÓRDOBA</div>
 
     <script>
-        // --- 1. PUERTO DE ESCUCHA (RECEPTOR IA) ---
+        // --- 1. PUERTO DE ESCUCHA (RECEPTOR DE LINKS) ---
         window.onload = function() {
+            // Analiza si el link trae un comando ia_input
             const urlParams = new URLSearchParams(window.location.search);
             const pedidoIA = urlParams.get('ia_input');
             
             if (pedidoIA) {
                 const input = document.getElementById('cmd-input');
-                input.value = decodeURIComponent(pedidoIA);
+                // Limpia el texto de códigos raros del link (%20, etc)
+                input.value = decodeURIComponent(pedidoIA.replace(/\+/g, ' '));
                 
-                // Procesamiento automático al recibir datos externos
+                // Ejecuta automáticamente después de medio segundo
                 setTimeout(() => {
                     procesarSLER();
                 }, 500);
@@ -129,35 +132,8 @@
                 const newLine = document.createElement('div');
                 newLine.className = 'data-line';
                 
-                // Registro de tiempo y salida de datos
+                // Formateo del mensaje en pantalla
                 const timestamp = new Date().toLocaleTimeString();
                 newLine.textContent = `[ESTABLE] ${timestamp}: ${input.value}`;
                 
-                stream.appendChild(newLine);
-                input.value = ""; // Limpiar consola
-                stream.scrollTop = stream.scrollHeight; // Auto-scroll
-            }
-        }
-
-        // --- 3. APLANADO A IMAGEN (CANVAS) ---
-        function generarSnapshotSLER() {
-            const areaCaptura = document.getElementById('data-stream');
-            
-            console.log("Nodo: Iniciando generación de imagen estable...");
-            
-            html2canvas(areaCaptura, {
-                backgroundColor: "#0a0a0c",
-                scale: 2, // Doble resolución para nitidez foveal
-                logging: false
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `SLER_V2_ESTABLE_${Date.now()}.png`;
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            }).catch(err => {
-                console.error("Fallo en el motor de captura:", err);
-            });
-        }
-    </script>
-</body>
-</html>
+                stream.appendChild(newLine
