@@ -15,4 +15,84 @@
 
         body, html { 
             margin: 0; padding: 0; background: #000; 
-            font-family: 'Consolas',
+            font-family: 'Consolas', 'Courier New', monospace; 
+            height: 100vh; display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Contenedor del Chat SLER */
+        #sler-engine-view {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 40px; background: var(--bg-sler);
+        }
+
+        .sler-container { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 4px; }
+
+        /* Estilo Base de Línea */
+        .bubble {
+            font-size: 30px; font-weight: bold; padding: 12px 25px;
+            max-width: 85%; line-height: 1.1; letter-spacing: 1px;
+        }
+
+        /* Línea Impar (M): Invitación Visual */
+        .m-type {
+            align-self: flex-start; color: var(--m-line);
+            border-left: 10px solid var(--m-anchor);
+            background: rgba(0, 122, 204, 0.1);
+            text-align: left;
+        }
+
+        /* Línea Par (C): Advertencia y Completitud */
+        .c-type {
+            align-self: flex-end; color: var(--line-c);
+            border-right: 10px solid var(--c-anchor);
+            background: rgba(255, 202, 40, 0.05);
+            text-align: right;
+        }
+
+        .panel-nodos { background: #111; padding: 25px; text-align: center; border-top: 1px solid #333; }
+        
+        button { 
+            padding: 18px 50px; font-size: 16px; font-weight: bold; 
+            cursor: pointer; background: var(--m-anchor); color: #fff; 
+            border: none; text-transform: uppercase; letter-spacing: 2px;
+        }
+        
+        button:hover { filter: brightness(1.2); }
+    </style>
+</head>
+<body>
+
+    <div id="sler-engine-view">
+        <div class="sler-container">
+            <div class="bubble m-type">EL SISTEMA SLER ES RECÍPRO-</div>
+            <div class="bubble c-type">-CO PORQUE LA LÍNEA PAR ADVIER-</div>
+            <div class="bubble m-type">-TE LA INCOMPLETITUD PSICOLÓGI-</div>
+            <div class="bubble c-type">-CA QUE EL OJO DEBE COMPLETAR.</div>
+        </div>
+    </div>
+
+    <div class="panel-nodos">
+        <button onclick="exportarSler()">GENERAR DESCARGA SLER</button>
+    </div>
+
+    <script>
+        async function exportarSler() {
+            const node = document.getElementById('sler-engine-view');
+            try {
+                const canvas = await html2canvas(node, { 
+                    backgroundColor: '#000',
+                    scale: 2 // Alta definición para evitar pixelado en la lectura
+                });
+                const link = document.createElement('a');
+                link.download = 'SLER_CHAT_PROCESO.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                console.error("Fallo en el renderizado del nodo", err);
+            }
+        }
+    </script>
+</body>
+</html>
