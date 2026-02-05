@@ -2,89 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SLER V2 - PROCESADOR DE TEXTO AMPLIO</title>
+    <title>SLER V2 - PLUGIN CHAT ENGINE</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
-            --bg: #000;
-            --m-color: #00ffcc;
-            --c-color: #fff;
-            --m-border: #007acc;
-            --c-border: #ffca28;
+            --bg-sler: #050505;
+            --m-line: #00ffcc;
+            --c-line: #ffffff;
+            --m-anchor: #007acc;
+            --c-anchor: #ffca28;
         }
 
         body, html { 
-            margin: 0; padding: 0; background: var(--bg); 
-            color: var(--m-color); font-family: 'Courier New', monospace; 
-            height: 100vh; display: flex; flex-direction: column; 
-        }
-
-        #area-render {
-            flex: 1; display: flex; flex-direction: column; justify-content: center;
-            padding: 50px; background: #0a0a0c; margin: 20px; border: 1px solid #333;
-        }
-
-        .contenedor-sler { width: 100%; max-width: 900px; margin: 0 auto; }
-
-        .linea {
-            font-size: 28px; font-weight: bold; margin: 8px 0; line-height: 1.4;
-            display: block; width: 100%;
-        }
-
-        /* Línea Impar (M) */
-        .m {
-            text-align: left; color: var(--m-color);
-            border-left: 5px solid var(--m-border); padding-left: 20px;
-        }
-
-        /* Línea Par (C) */
-        .c {
-            text-align: right; color: var(--c-color);
-            border-right: 5px solid var(--c-border); padding-right: 20px;
-        }
-
-        .controles { background: #1a1a1f; padding: 20px; text-align: center; border-top: 2px solid var(--m-border); }
-        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: var(--m-border); color: #fff; border: none; font-weight: bold; }
-        #status { color: #ffca28; margin-top: 10px; font-size: 14px; }
-    </style>
-</head>
-<body>
-
-    <div id="area-render">
-        <div class="contenedor-sler" id="sler-target">
-            <div class="linea m">EL SISTEMA DE LECTOESCRITURA RECÍPRO-</div>
-            <div class="linea c">-CO ELIMINA EL MOVIMIENTO SACCÁDICO</div>
-            <div class="linea m">APROVECHANDO LA CAPACIDAD DE COMPLETITU-</div>
-            <div class="linea c">-D PSICOLÓGICA DEL OJO HUMANO EN CADA</div>
-            <div class="linea m">LÍNEA ANTAGÓNICA QUE EL MOTOR PROCE-</div>
-            <div class="linea c">-SA PARA UNA LECTURA SIN SALTOS.</div>
-        </div>
-    </div>
-
-    <div class="controles">
-        <button onclick="descargarProcesamiento()">DESCARGAR IMAGEN AMPLIA</button>
-        <div id="status">TEXTO CARGADO Y LISTO PARA PROCESAR</div>
-    </div>
-
-    <script>
-        async function descargarProcesamiento() {
-            const status = document.getElementById('status');
-            status.innerText = "SINTETIZANDO IMAGEN...";
-            
-            try {
-                const canvas = await html2canvas(document.getElementById('area-render'), {
-                    backgroundColor: '#000',
-                    scale: 2
-                });
-                const link = document.createElement('a');
-                link.download = 'SLER_TEXTO_AMPLIO.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                status.innerText = "¡DESCARGA EXITOSA! ADJUNTA EL ARCHIVO AL CHAT.";
-            } catch (e) {
-                status.innerText = "FALLA EN EL NODO: " + e.message;
-            }
-        }
-    </script>
-</body>
-</html>
+            margin: 0; padding: 0; background: #000; 
+            font-family: 'Consolas',
