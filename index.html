@@ -1,25 +1,128 @@
-function generarSnapshotSLER() {
-    // Capturamos el contenedor principal de datos
-    const areaCaptura = document.getElementById('data-stream') || document.querySelector('.main-content');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLER - MOTOR V2 PRIVATE</title>
     
-    console.log("Iniciando aplanado de formato estable...");
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    html2canvas(areaCaptura, {
-        backgroundColor: "#0a0a0c", // Mantiene tu estética oscura
-        scale: 2, // Calidad optimizada para lectura
-        logging: false,
-        useCORS: true // Por si usas recursos externos
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `SLER_V2_OUTPUT_${new Date().getTime()}.png`;
-        link.href = canvas.toDataURL("image/png");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    <style>
+        :root { 
+            --bg: #0a0a0c; 
+            --panel: #16161a; 
+            --accent: #007acc; 
+            --success: #4ec9b0; 
+            --text: #a0a0a0; 
+        }
+        body { 
+            font-family: 'Consolas', monospace; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column;
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* Área de Visualización (Nodo Logístico) */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .data-line { margin-bottom: 5px; border-left: 2px solid var(--accent); padding-left: 10px; }
+
+        /* Consola de Comandos */
+        .footer-console {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: var(--panel);
+            border-top: 1px solid #333;
+        }
+
+        input {
+            flex: 1;
+            background: #000;
+            color: var(--success);
+            border: 1px solid #444;
+            padding: 10px;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-exec { background: var(--accent); color: white; }
+        .btn-export { background: var(--success); color: black; }
         
-        console.log("Archivo exportado exitosamente.");
-    }).catch(err => {
-        console.error("Error en el motor de exportación:", err);
-        alert("Error al generar el formato estable. Revisa la consola (F12).");
-    });
-}
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="main-content" id="data-stream">
+        <div class="data-line">[SYSTEM STATUS] MOTOR V2: ONLINE</div>
+        <div class="data-line">[OWNER] RIBOT JONATAN - IP: REGISTERED 2025</div>
+    </div>
+
+    <div class="footer-console">
+        <input type="text" id="cmd-input" placeholder="Ingrese comando SLER..." onkeypress="if(event.key==='Enter') procesarSLER()">
+        
+        <button onclick="procesarSLER()" class="btn-exec">
+            EXECUTE
+        </button>
+        
+        <button onclick="generarSnapshotSLER()" class="btn-export">
+            EXPORTAR PNG
+        </button>
+    </div>
+
+    <script>
+        // Lógica de procesamiento (Nodo Logístico)
+        function procesarSLER() {
+            const input = document.getElementById('cmd-input');
+            const stream = document.getElementById('data-stream');
+            
+            if (input.value.trim() !== "") {
+                const newLine = document.createElement('div');
+                newLine.className = 'data-line';
+                newLine.textContent = `[PROCESS] ${new Date().toLocaleTimeString()}: ${input.value}`;
+                stream.appendChild(newLine);
+                
+                // Limpiar input y hacer scroll
+                input.value = "";
+                stream.scrollTop = stream.scrollHeight;
+            }
+        }
+
+        // Función de Aplanado para Formato Estable (Imagen)
+        function generarSnapshotSLER() {
+            const areaCaptura = document.getElementById('data-stream');
+            
+            console.log("Iniciando aplanado de imagen...");
+            
+            html2canvas(areaCaptura, {
+                backgroundColor: "#0a0a0c",
+                scale: 2 // Alta calidad foveal
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `SLER_V2_ESTABLE_${Date.now()}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            }).catch(err => {
+                console.error("Error en la exportación:", err);
+            });
+        }
+    </script>
+</body>
+</html>
