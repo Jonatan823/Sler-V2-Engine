@@ -2,110 +2,105 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SLER - IDE (ENTORNO DE DESARROLLO)</title>
+    <title>SLER IDE - AI INTERFACE NODE</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        :root {
-            --ide-bg: #1e1e1e;
-            --ide-sidebar: #252526;
-            --ide-accent: #007acc;
-            --text-m: #00ffcc;
-            --text-c: #ffffff;
-        }
+        :root { --bg: #0a0a0c; --m-cyan: #00ffcc; --c-white: #ffffff; --border: #333; }
+        body, html { margin: 0; padding: 0; background: var(--bg); font-family: 'Consolas', monospace; height: 100vh; display: flex; flex-direction: column; color: #888; }
+        
+        /* Barra de Estado del Nodo */
+        .status-bar { background: #1a1a1f; padding: 8px 20px; border-bottom: 2px solid #007acc; display: flex; justify-content: space-between; font-size: 12px; }
+        
+        .workspace { display: flex; flex: 1; overflow: hidden; }
 
-        body, html { 
-            margin: 0; padding: 0; background: var(--ide-bg); 
-            color: #ccc; font-family: 'Consolas', monospace; 
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
-        }
+        /* Panel de Recepción (Insumo de la IA) */
+        .ai-input-panel { width: 300px; background: #111; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .label { padding: 10px; background: #222; font-size: 11px; letter-spacing: 1px; }
+        #raw-input { flex: 1; padding: 15px; background: transparent; color: #555; border: none; font-size: 14px; resize: none; outline: none; }
 
-        /* Barra de Herramientas Superior */
-        .toolbar { 
-            background: var(--ide-sidebar); padding: 10px 20px; 
-            border-bottom: 1px solid #333; display: flex; gap: 20px; align-items: center;
-        }
+        /* Pantalla de Renderizado (Motor SLER) */
+        #sler-output-node { flex: 1; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; }
+        .sler-line { width: 100%; max-width: 800px; font-size: 28px; font-weight: bold; margin: 6px 0; line-height: 1.2; }
+        
+        /* Reglas de Estilo Recíproco */
+        .m-line { text-align: left; color: var(--m-cyan); border-left: 6px solid #007acc; padding-left: 20px; }
+        .c-line { text-align: right; color: var(--c-white); border-right: 6px solid #ffca28; padding-right: 20px; }
 
-        .main-layout { display: flex; flex: 1; }
-
-        /* Panel de Código (Entrada) */
-        .code-editor { 
-            flex: 1; border-right: 1px solid #333; display: flex; flex-direction: column; 
-            background: #1e1e1e;
-        }
-        .panel-label { background: #2d2d2d; padding: 5px 15px; font-size: 12px; color: #aaa; text-transform: uppercase; }
-        textarea { 
-            flex: 1; background: transparent; color: #d4d4d4; border: none; 
-            padding: 20px; font-family: 'Consolas', monospace; font-size: 16px; outline: none; resize: none;
-        }
-
-        /* Panel de Salida (Motor SLER) */
-        .sler-preview { 
-            flex: 1; background: #000; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 20px;
-        }
-
-        /* Formato SLER Técnico */
-        .linea { width: 90%; font-size: 26px; font-weight: bold; margin: 4px 0; }
-        .m { text-align: left; color: var(--text-m); border-left: 4px solid var(--ide-accent); padding-left: 15px; }
-        .c { text-align: right; color: var(--text-c); border-right: 4px solid #ffca28; padding-right: 15px; }
-
-        button { 
-            background: var(--ide-accent); color: white; border: none; 
-            padding: 8px 20px; cursor: pointer; font-weight: bold; font-size: 12px;
-        }
-        button:hover { background: #005fa3; }
+        /* Controles Manuales */
+        .footer { background: #1a1a1f; padding: 20px; text-align: center; border-top: 1px solid var(--border); }
+        .btn-download { padding: 15px 40px; background: #007acc; color: #fff; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-    <div class="toolbar">
-        <span><strong>SLER IDE v2.0</strong></span>
-        <button onclick="procesarTexto()">COMPILAR SLER</button>
-        <button onclick="descargarCaptura()" style="background: #2d2d2d;">EXPORTAR BINARIO (IMG)</button>
+    <div class="status-bar">
+        <span>ID: SLER-NODE-ARG-2026</span>
+        <span id="node-status">ESPERANDO SOLICITUD DE IA...</span>
     </div>
 
-    <div class="main-layout">
-        <div class="code-editor">
-            <div class="panel-label">Source Input</div>
-            <textarea id="input-text">EL SISTEMA DE LECTURA ES RECÍPRO-
--CO PORQUE ELIMINA EL SALTO DE LÍ-
--NEA INTEGRANDO LA PSICOLOGÍA VI-
--SUAL DE COMPLETITUD EN EL OJO.</textarea>
+    <div class="workspace">
+        <div class="ai-input-panel">
+            <div class="label">DATOS CRUDOS (IA INPUT)</div>
+            <textarea id="raw-input" readonly>El dato enviado por la IA aparecerá aquí automáticamente...</textarea>
         </div>
 
-        <div class="sler-preview" id="render-target">
-            <div class="panel-label" style="position: absolute; top: 50px;">SLER Engine Output</div>
-            <div id="output-container" style="width: 100%;">
-                </div>
-        </div>
+        <div id="sler-output-node">
+            </div>
+    </div>
+
+    <div class="footer">
+        <button class="btn-download" onclick="exportarProcesamiento()">Descargar para entregar a IA</button>
     </div>
 
     <script>
-        function procesarTexto() {
-            const input = document.getElementById('input-text').value;
-            const container = document.getElementById('output-container');
-            container.innerHTML = ''; // Limpiar
+        // ESCUCHA AUTOMÁTICA DE LA IA
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const textoParaTransformar = params.get('ia_input');
+            
+            if (textoParaTransformar) {
+                const raw = decodeURIComponent(textoParaTransformar).replace(/\+/g, ' ');
+                document.getElementById('raw-input').value = raw;
+                document.getElementById('node-status').innerText = "ESTADO: TEXTO TRANSFORMADO";
+                transformarASLER(raw);
+            }
+        };
 
-            const lineas = input.split('\n');
-            lineas.forEach((texto, index) => {
+        function transformarASLER(texto) {
+            const output = document.getElementById('sler-output-node');
+            output.innerHTML = '';
+            
+            // Lógica de partición automática 60 CH / SLER
+            const palabras = texto.split(' ');
+            let lineas = [];
+            let actual = "";
+
+            palabras.forEach(p => {
+                if ((actual + p).length < 35) {
+                    actual += p + " ";
+                } else {
+                    lineas.push(actual.trim() + "-");
+                    actual = "-" + p + " ";
+                }
+            });
+            lineas.push(actual.trim());
+
+            lineas.forEach((lin, i) => {
                 const div = document.createElement('div');
-                div.className = 'linea ' + (index % 2 === 0 ? 'm' : 'c');
-                div.innerText = texto.trim();
-                container.appendChild(div);
+                div.className = `sler-line ${i % 2 === 0 ? 'm-line' : 'c-line'}`;
+                div.innerText = lin.toUpperCase();
+                output.appendChild(div);
             });
         }
 
-        async function descargarCaptura() {
-            const node = document.getElementById('render-target');
-            const canvas = await html2canvas(node, { backgroundColor: '#000' });
+        async function exportarProcesamiento() {
+            const target = document.getElementById('sler-output-node');
+            const canvas = await html2canvas(target, { backgroundColor: '#000', scale: 2 });
             const link = document.createElement('a');
-            link.download = 'IDE_OUTPUT_SLER.png';
+            link.download = 'ENTREGA_IA_SLER.png';
             link.href = canvas.toDataURL();
             link.click();
         }
-
-        // Ejecución inicial
-        procesarTexto();
     </script>
 </body>
 </html>
