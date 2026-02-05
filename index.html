@@ -2,104 +2,110 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>CHAT SLER - ESCRITORIO PERSONAL</title>
+    <title>SLER - IDE (ENTORNO DE DESARROLLO)</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
+        :root {
+            --ide-bg: #1e1e1e;
+            --ide-sidebar: #252526;
+            --ide-accent: #007acc;
+            --text-m: #00ffcc;
+            --text-c: #ffffff;
+        }
+
         body, html { 
-            margin: 0; padding: 0; background: #fff; 
-            font-family: 'Courier New', Courier, monospace; 
-            height: 100vh; display: flex; flex-direction: column;
+            margin: 0; padding: 0; background: var(--ide-bg); 
+            color: #ccc; font-family: 'Consolas', monospace; 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Barra Superior */
-        .header { 
-            background: #000; color: #fff; padding: 5px 20px; 
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: bold; font-size: 14px;
+        /* Barra de Herramientas Superior */
+        .toolbar { 
+            background: var(--ide-sidebar); padding: 10px 20px; 
+            border-bottom: 1px solid #333; display: flex; gap: 20px; align-items: center;
         }
 
-        /* Cuerpo Principal */
-        .main-container { display: flex; flex: 1; border: 2px solid #000; }
+        .main-layout { display: flex; flex: 1; }
 
-        /* Columna Izquierda: Contactos */
-        .sidebar-left { width: 200px; border-right: 2px solid #000; display: flex; flex-direction: column; }
-        .tab-header { background: #000; color: #fff; text-align: center; padding: 5px; font-size: 12px; }
-        .btn-contacto { border: 2px solid #000; margin: 5px; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; }
-
-        /* Área Central: Chat */
-        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .chat-display { 
-            flex: 1; padding: 20px; overflow-y: auto; line-height: 1.6;
-            font-size: 18px; text-align: justify;
+        /* Panel de Código (Entrada) */
+        .code-editor { 
+            flex: 1; border-right: 1px solid #333; display: flex; flex-direction: column; 
+            background: #1e1e1e;
         }
-        .input-box { border-top: 2px solid #000; padding: 15px; background: #eee; }
-        .input-field { border: 2px solid #000; width: 95%; padding: 10px; background: #fff; color: #999; }
+        .panel-label { background: #2d2d2d; padding: 5px 15px; font-size: 12px; color: #aaa; text-transform: uppercase; }
+        textarea { 
+            flex: 1; background: transparent; color: #d4d4d4; border: none; 
+            padding: 20px; font-family: 'Consolas', monospace; font-size: 16px; outline: none; resize: none;
+        }
 
-        /* Columna Derecha: Datos/Acciones */
-        .sidebar-right { width: 180px; border-left: 2px solid #000; display: flex; flex-direction: column; }
-        .btn-accion { border: 2px solid #000; margin: 5px; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; }
+        /* Panel de Salida (Motor SLER) */
+        .sler-preview { 
+            flex: 1; background: #000; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; padding: 20px;
+        }
 
-        /* Footer */
-        .footer-btns { display: flex; border-top: 2px solid #000; }
-        .f-btn { flex: 1; border-right: 2px solid #000; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; }
+        /* Formato SLER Técnico */
+        .linea { width: 90%; font-size: 26px; font-weight: bold; margin: 4px 0; }
+        .m { text-align: left; color: var(--text-m); border-left: 4px solid var(--ide-accent); padding-left: 15px; }
+        .c { text-align: right; color: var(--text-c); border-right: 4px solid #ffca28; padding-right: 15px; }
 
-        /* Lógica SLER para el texto */
-        .sler-text { white-space: pre-wrap; }
+        button { 
+            background: var(--ide-accent); color: white; border: none; 
+            padding: 8px 20px; cursor: pointer; font-weight: bold; font-size: 12px;
+        }
+        button:hover { background: #005fa3; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <span>CONTACTOS</span>
-        <span>ESCRITORIO PERSONAL - PRÁCTICA 60 CH</span>
-        <span>DATOS :</span>
+    <div class="toolbar">
+        <span><strong>SLER IDE v2.0</strong></span>
+        <button onclick="procesarTexto()">COMPILAR SLER</button>
+        <button onclick="descargarCaptura()" style="background: #2d2d2d;">EXPORTAR BINARIO (IMG)</button>
     </div>
 
-    <div class="main-container" id="capture-target">
-        <div class="sidebar-left">
-            <div class="btn-contacto">JONA</div>
-            <div class="btn-contacto">JONA</div>
-            <div class="btn-contacto">MARCOS</div>
-            <div style="flex:1"></div>
-            <div class="btn-contacto">SALIR</div>
+    <div class="main-layout">
+        <div class="code-editor">
+            <div class="panel-label">Source Input</div>
+            <textarea id="input-text">EL SISTEMA DE LECTURA ES RECÍPRO-
+-CO PORQUE ELIMINA EL SALTO DE LÍ-
+-NEA INTEGRANDO LA PSICOLOGÍA VI-
+-SUAL DE COMPLETITUD EN EL OJO.</textarea>
         </div>
 
-        <div class="chat-area">
-            <div class="chat-display">
-                "La neurofisiología del aprendizaje requiere una sin- <br>
-                -lectu de sistema El !Atención; .perfecta cronización <br>
-                ra recíproca permite que el pensamiento se expanda. <br>
-                -completa de capacidad la extraordinaria es no Acaso¿ <br>
-                r fragmentos? Esta metodología antagonista desafía <br>
-                fluidez la Descubre; .tradicionales paradigmas los <br>
-                absoluta y transforma tu percepción cognitiva hoy mi- <br>
-                smo!"
-            </div>
-            <div class="input-box">
-                <div class="input-field">Escribe para practicar...</div>
-            </div>
-            <div class="footer-btns">
-                <div class="f-btn">VISTA SLER</div>
-                <div class="f-btn" onclick="descargarCaptura()">NORMAL</div>
-            </div>
-        </div>
-
-        <div class="sidebar-right">
-            <div class="btn-accion">TEST</div>
-            <div class="btn-accion">HOME</div>
-            <div class="btn-accion">AYUDA</div>
+        <div class="sler-preview" id="render-target">
+            <div class="panel-label" style="position: absolute; top: 50px;">SLER Engine Output</div>
+            <div id="output-container" style="width: 100%;">
+                </div>
         </div>
     </div>
 
     <script>
+        function procesarTexto() {
+            const input = document.getElementById('input-text').value;
+            const container = document.getElementById('output-container');
+            container.innerHTML = ''; // Limpiar
+
+            const lineas = input.split('\n');
+            lineas.forEach((texto, index) => {
+                const div = document.createElement('div');
+                div.className = 'linea ' + (index % 2 === 0 ? 'm' : 'c');
+                div.innerText = texto.trim();
+                container.appendChild(div);
+            });
+        }
+
         async function descargarCaptura() {
-            const node = document.getElementById('capture-target');
-            const canvas = await html2canvas(node);
+            const node = document.getElementById('render-target');
+            const canvas = await html2canvas(node, { backgroundColor: '#000' });
             const link = document.createElement('a');
-            link.download = 'CHAT_SLER_ESCRITORIO.png';
+            link.download = 'IDE_OUTPUT_SLER.png';
             link.href = canvas.toDataURL();
             link.click();
         }
+
+        // Ejecución inicial
+        procesarTexto();
     </script>
 </body>
 </html>
