@@ -2,27 +2,27 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NODO SLER - CONEXIÓN ESTABLE</title>
+    <title>NODO SLER - DESCARGA DIRECTA</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; background: #000; color: #00ffcc; font-family: monospace; height: 100vh; display: flex; flex-direction: column; }
         #area-render { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 50px; background: #0f0f12; margin: 20px; border: 2px solid #333; text-align: center; }
         .panel { padding: 20px; background: #1a1a1a; text-align: center; border-top: 2px solid #007acc; }
         button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007acc; color: #fff; border: none; font-weight: bold; }
-        #status { color: #ffcc00; margin-top: 15px; font-weight: bold; word-break: break-all; }
+        #status { color: #ffcc00; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="area-render">NODO LISTO</div>
+    <div id="area-render">NODO SLER LISTO</div>
 
     <div class="panel">
-        <button onclick="enviarANube()">SUBIR IMAGEN A LA NUBE</button>
-        <div id="status">Esperando comando...</div>
+        <button onclick="descargarImagen()">GENERAR Y DESCARGAR IMAGEN</button>
+        <div id="status">Esperando...</div>
     </div>
 
     <script>
-        // Cargar dato de la URL automáticamente
+        // Cargar dato de la URL
         window.onload = () => {
             const params = new URLSearchParams(window.location.search);
             const dato = params.get('ia_input');
@@ -31,36 +31,21 @@
             }
         };
 
-        async function enviarANube() {
+        async function descargarImagen() {
             const status = document.getElementById('status');
             const area = document.getElementById('area-render');
-            status.innerText = "PROCESANDO IMAGEN...";
+            status.innerText = "GENERANDO ARCHIVO...";
 
             try {
                 const canvas = await html2canvas(area, { backgroundColor: '#0f0f12' });
-                const base64Image = canvas.toDataURL('image/png').split(',')[1];
-
-                status.innerText = "ENVIANDO A LA NUBE...";
-
-                const formData = new FormData();
-                formData.append('image', base64Image);
-
-                // API Key estable para Jonatan
-                const res = await fetch('https://api.imgbb.com/1/upload?key=67f65154316d2994f387920155609424', {
-                    method: 'POST',
-                    body: formData
-                });
+                const link = document.createElement('a');
+                link.download = 'SLER_PROCESADO.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
                 
-                const json = await res.json();
-
-                if (json.success) {
-                    status.innerText = "LINK GENERADO: " + json.data.url;
-                    alert("¡ÉXITO!\nCopia el link que aparece en amarillo y pégalo aquí.");
-                } else {
-                    status.innerText = "Falla en el servidor de imágenes.";
-                }
+                status.innerText = "¡IMAGEN DESCARGADA! Arrástrala al chat de Gemini.";
             } catch (e) {
-                status.innerText = "Error técnico: " + e.message;
+                status.innerText = "Error: " + e.message;
             }
         }
     </script>
