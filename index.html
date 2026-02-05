@@ -2,16 +2,90 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NODO LOGÍSTICO SLER - VERSIÓN FINAL</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+    <title>NODO SLER - EMERGENCIA</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        /* Estética de terminal de alto contraste */
         body, html { 
             margin: 0; padding: 0; 
-            background: #000; 
-            color: #00ffcc; 
-            font-family: 'Courier New', Courier, monospace; 
-            height: 1
+            background-color: #000 !important; 
+            color: #00ffcc !important; 
+            font-family: sans-serif; 
+            height: 100vh; width: 100vw;
+            display: flex; flex-direction: column;
+        }
+        #area-render {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 60px; font-weight: bold;
+            background-color: #111 !important;
+            border: 5px solid #222;
+            margin: 20px;
+        }
+        .panel { padding: 20px; background: #1a1a1a; text-align: center; }
+        button { 
+            padding: 20px 40px; font-size: 20px; cursor: pointer; 
+            background: #007acc; color: white; border: none; 
+        }
+        #status { color: #ff0; margin-top: 15px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <div id="area-render">INICIANDO...</div>
+
+    <div class="panel">
+        <button onclick="enviarAIa()">SUBIR IMAGEN A LA NUBE</button>
+        <div id="status">Esperando comando...</div>
+    </div>
+
+    <script>
+        // Función para capturar el dato de la URL inmediatamente
+        function procesarUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const dato = params.get('ia_input');
+            const display = document.getElementById('area-render');
+            
+            if (dato) {
+                display.innerText = decodeURIComponent(dato).replace(/_/g, ' ');
+            } else {
+                display.innerText = "NODO LISTO";
+            }
+        }
+
+        // Ejecutar al cargar
+        window.onload = procesarUrl;
+
+        async function enviarAIa() {
+            const status = document.getElementById('status');
+            const area = document.getElementById('area-render');
+            status.innerText = "CAPTURANDO...";
+
+            try {
+                const canvas = await html2canvas(area);
+                status.innerText = "SUBIENDO...";
+                
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('file', blob, 'foto.png');
+
+                    const res = await fetch('https://file.io/?expires=1d', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const json = await res.json();
+
+                    if (json.success) {
+                        status.innerText = "LINK: " + json.link;
+                        console.log("URL:", json.link);
+                        alert("COPIA ESTO:\n" + json.link);
+                    } else {
+                        status.innerText = "Error en subida";
+                    }
+                }, 'image/png');
+            } catch (e) {
+                status.innerText = "Error: " + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
