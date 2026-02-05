@@ -20,6 +20,7 @@
         .led { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; background: #333; }
         .led-on { background: var(--success); box-shadow: 0 0 5px var(--success); }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -66,7 +67,7 @@
         <div id="data-stream"></div>
         <footer class="console-footer">
             <input type="text" id="cmd-input" placeholder="Comando..." style="width: 80%; background: #000; border: 1px solid #333; color: #fff; padding: 10px;">
-            <button onclick="sendData()" style="padding: 10px 20px; background: var(--accent); border: none; color: white; cursor: pointer;">EXECUTE</button>
+            <button onclick="sendData()" style="padding: 10px 20px; background: var(--accent); border: none; color: white; cursor: pointer;">EXECUTE</<button onclick="generarSnapshotSLER()" style="padding: 10px 20px; background: var(--success); border: none; color: black; cursor: pointer; font-weight: bold; margin-left: 10px;">EXPORTAR PNG ESTABLE</button>>
         </footer>
     </main>
 
@@ -152,7 +153,24 @@ function registrarSolicitudExterna(tipo = "SYNC") {
 db.ref('mensajes').on('child_added', () => {
     registrarSolicitudExterna("DATA_FETCH");
 });
+        function generarSnapshotSLER() {
+    const areaCaptura = document.getElementById('main-display'); // Captura todo el flujo de datos
+    
+    html2canvas(areaCaptura, {
+        backgroundColor: "#0a0a0c",
+        scale: 2 // Alta definición para lectura foveal
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `SLER_V2_ESTABLE_${Date.now()}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        
+        // Registrar que el aplicativo entregó un formato fijo
+        registrarSolicitudExterna("PNG_EXPORT");
+    });
+}
     </script>
 </body>
 </html>
+
 
