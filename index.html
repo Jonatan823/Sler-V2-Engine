@@ -2,96 +2,78 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SLER V2 - PLUGIN CHAT ENGINE</title>
+    <title>SLER CHAT ENGINE - NODO PURO</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        :root {
-            --bg-sler: #050505;
-            --m-line: #00ffcc;
-            --c-line: #ffffff;
-            --m-anchor: #007acc;
-            --c-anchor: #ffca28;
-        }
-
         body, html { 
             margin: 0; padding: 0; background: #000; 
-            font-family: 'Consolas', 'Courier New', monospace; 
-            height: 100vh; display: flex; flex-direction: column;
-            overflow: hidden;
+            font-family: 'Consolas', monospace; height: 100vh; 
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Contenedor del Chat SLER */
-        #sler-engine-view {
+        /* El Canvas SLER: Espacio de lectura recíproca pura */
+        #sler-canvas {
             flex: 1; display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            padding: 40px; background: var(--bg-sler);
+            background: #000; padding: 0 10%;
         }
 
-        .sler-container { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 4px; }
+        .sler-layout { width: 100%; display: flex; flex-direction: column; }
 
-        /* Estilo Base de Línea */
-        .bubble {
-            font-size: 30px; font-weight: bold; padding: 12px 25px;
-            max-width: 85%; line-height: 1.1; letter-spacing: 1px;
+        .linea { 
+            font-size: 38px; font-weight: bold; 
+            margin: 5px 0; letter-spacing: 1px;
+            width: 100%;
         }
 
-        /* Línea Impar (M): Invitación Visual */
-        .m-type {
-            align-self: flex-start; color: var(--m-line);
-            border-left: 10px solid var(--m-anchor);
-            background: rgba(0, 122, 204, 0.1);
-            text-align: left;
+        /* Línea Impar (M): Flujo hacia la derecha */
+        .m {
+            text-align: left; color: #00ffcc;
         }
 
-        /* Línea Par (C): Advertencia y Completitud */
-        .c-type {
-            align-self: flex-end; color: var(--line-c);
-            border-right: 10px solid var(--c-anchor);
-            background: rgba(255, 202, 40, 0.05);
-            text-align: right;
+        /* Línea Par (C): Contraflujo desde la derecha */
+        /* Aplicando guion de advertencia inicial según regla 2026-01-23 */
+        .c {
+            text-align: right; color: #ffffff;
         }
 
-        .panel-nodos { background: #111; padding: 25px; text-align: center; border-top: 1px solid #333; }
-        
+        .panel-control { 
+            background: #111; padding: 15px; text-align: center; 
+            border-top: 1px solid #333; 
+        }
+
         button { 
-            padding: 18px 50px; font-size: 16px; font-weight: bold; 
-            cursor: pointer; background: var(--m-anchor); color: #fff; 
-            border: none; text-transform: uppercase; letter-spacing: 2px;
+            padding: 12px 35px; font-size: 16px; cursor: pointer; 
+            background: #007acc; color: white; border: none; font-weight: bold;
         }
-        
-        button:hover { filter: brightness(1.2); }
     </style>
 </head>
 <body>
 
-    <div id="sler-engine-view">
-        <div class="sler-container">
-            <div class="bubble m-type">EL SISTEMA SLER ES RECÍPRO-</div>
-            <div class="bubble c-type">-CO PORQUE LA LÍNEA PAR ADVIER-</div>
-            <div class="bubble m-type">-TE LA INCOMPLETITUD PSICOLÓGI-</div>
-            <div class="bubble c-type">-CA QUE EL OJO DEBE COMPLETAR.</div>
+    <div id="sler-canvas">
+        <div class="sler-layout">
+            <div class="linea m">EL SISTEMA DE LECTURA ES RECÍPRO-</div>
+            <div class="linea c">-CO PORQUE LA LÍNEA PAR ADVIER-</div>
+            <div class="linea m">TE LA INCOMPLETITUD PSICOLÓGI-</div>
+            <div class="linea c">-CA QUE EL OJO DEBE COMPLETAR.</div>
         </div>
     </div>
 
-    <div class="panel-nodos">
-        <button onclick="exportarSler()">GENERAR DESCARGA SLER</button>
+    <div class="panel-control">
+        <button onclick="descargarChatSler()">DESCARGAR CHAT SLER</button>
     </div>
 
     <script>
-        async function exportarSler() {
-            const node = document.getElementById('sler-engine-view');
-            try {
-                const canvas = await html2canvas(node, { 
-                    backgroundColor: '#000',
-                    scale: 2 // Alta definición para evitar pixelado en la lectura
-                });
-                const link = document.createElement('a');
-                link.download = 'SLER_CHAT_PROCESO.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            } catch (err) {
-                console.error("Fallo en el renderizado del nodo", err);
-            }
+        async function descargarChatSler() {
+            const area = document.getElementById('sler-canvas');
+            const canvas = await html2canvas(area, { 
+                backgroundColor: '#000',
+                scale: 2 
+            });
+            const link = document.createElement('a');
+            link.download = 'SLER_CHAT_PURO.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
     </script>
 </body>
