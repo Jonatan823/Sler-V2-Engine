@@ -1,0 +1,11 @@
+{
+  "protocol": "SLER-B_BINDING",
+  "endpoint": "https://sler-chat-lab-default-rtdb.firebaseio.com/mensajes.json",
+  "constraints": {
+    "desktop_ch": 60,
+    "mobile_ch": 28,
+    "required_flags": ["RECIPROCAL_FLOW", "STRICT_SYLLABLE"]
+  },
+  "owner": "Ribot Jonatan",
+  "intellectual_property_ref": "Registered 2025"
+}
