@@ -2,52 +2,125 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>NODO SLER - DESCARGA DIRECTA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLER V2 - NODO DE PROCESAMIENTO</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; background: #000; color: #00ffcc; font-family: monospace; height: 100vh; display: flex; flex-direction: column; }
-        #area-render { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 50px; background: #0f0f12; margin: 20px; border: 2px solid #333; text-align: center; }
-        .panel { padding: 20px; background: #1a1a1a; text-align: center; border-top: 2px solid #007acc; }
-        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007acc; color: #fff; border: none; font-weight: bold; }
-        #status { color: #ffcc00; margin-top: 15px; }
+        :root {
+            --bg-deep: #000000;
+            --bg-panel: #0f0f12;
+            --accent-m: #007acc; /* Color para líneas M */
+            --accent-c: #ffca28; /* Color para líneas C */
+            --text-main: #00ffcc;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; 
+            background: var(--bg-deep); 
+            color: var(--text-main); 
+            font-family: 'Courier New', Courier, monospace; 
+            height: 100vh; display: flex; flex-direction: column; 
+            overflow: hidden;
+        }
+
+        /* Área de Renderizado SLER */
+        #area-render {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-panel);
+            margin: 20px;
+            border: 2px solid #222;
+            padding: 40px;
+        }
+
+        /* Estructura de Líneas Recíprocas */
+        .linea-sler {
+            width: 90%;
+            font-size: 42px;
+            font-weight: bold;
+            margin: 15px 0;
+            line-height: 1.2;
+        }
+
+        /* Línea Impar (M) - Flujo Natural */
+        .impar {
+            text-align: left;
+            color: var(--text-main);
+            border-left: 6px solid var(--accent-m);
+            padding-left: 20px;
+        }
+
+        /* Línea Par (C) - Contraflujo/Advertencia */
+        .par {
+            text-align: right;
+            color: #ffffff;
+            border-right: 6px solid var(--accent-c);
+            padding-right: 20px;
+        }
+
+        /* Panel de Control */
+        .panel {
+            padding: 25px;
+            background: #1a1a1f;
+            text-align: center;
+            border-top: 3px solid var(--accent-m);
+        }
+
+        button {
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: var(--accent-m);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover { background: #005fa3; }
+        #status { color: #ffca28; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div id="area-render">NODO SLER LISTO</div>
+    <div id="area-render">
+        <div class="linea-sler impar" id="linea-m">LEC-</div>
+        <div class="linea-sler par" id="linea-c">-TURA</div>
+    </div>
 
     <div class="panel">
-        <button onclick="descargarImagen()">GENERAR Y DESCARGAR IMAGEN</button>
-        <div id="status">Esperando...</div>
+        <button onclick="ejecutarCaptura()">GENERAR PROCESAMIENTO SLER</button>
+        <div id="status">SISTEMA OPERATIVO - ESPERANDO CAPTURA</div>
     </div>
 
     <script>
-        // Cargar dato de la URL
+        // Captura de datos desde URL para automatismo
         window.onload = () => {
             const params = new URLSearchParams(window.location.search);
-            const dato = params.get('ia_input');
-            if (dato) {
-                document.getElementById('area-render').innerText = decodeURIComponent(dato).replace(/_/g, ' ');
-            }
+            const datoM = params.get('m'); // Ejemplo: ?m=SISTE-
+            const datoC = params.get('c'); // Ejemplo: &c=-MA
+            
+            if (datoM) document.getElementById('linea-m').innerText = decodeURIComponent(datoM);
+            if (datoC) document.getElementById('linea-c').innerText = decodeURIComponent(datoC);
         };
 
-        async function descargarImagen() {
+        async function ejecutarCaptura() {
             const status = document.getElementById('status');
             const area = document.getElementById('area-render');
-            status.innerText = "GENERANDO ARCHIVO...";
+            status.innerText = "CAPTURING NEUROLINGUISTIC FRAME...";
 
             try {
                 const canvas = await html2canvas(area, { backgroundColor: '#0f0f12' });
                 const link = document.createElement('a');
-                link.download = 'SLER_PROCESADO.png';
+                link.download = 'SLER_LOGICA_PROCESADA.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                
-                status.innerText = "¡IMAGEN DESCARGADA! Arrástrala al chat de Gemini.";
+                status.innerText = "DESCARGA COMPLETADA. ADJUNTE EL ARCHIVO AL CHAT.";
             } catch (e) {
-                status.innerText = "Error: " + e.message;
+                status.innerText = "ERROR EN EL NODO: " + e.message;
             }
         }
-    </script>
-</body>
-</html>
