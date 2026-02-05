@@ -3,126 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLER - MOTOR V2 PRIVATE</title>
+    <title>SLER V2 - NODO LOGÍSTICO CENTRAL</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root { 
             --bg: #0a0a0c; 
-            --panel: #16161a; 
+            --panel: #111114; 
             --accent: #007acc; 
             --success: #4ec9b0; 
-            --text: #a0a0a0; 
+            --text: #d4d4d4; 
         }
         body { 
-            font-family: 'Consolas', monospace; 
+            font-family: 'Consolas', 'Courier New', monospace; 
             background: var(--bg); 
             color: var(--text); 
             margin: 0; 
             display: flex; 
             flex-direction: column;
             height: 100vh; 
-            overflow: hidden; 
         }
 
-        /* Área de Visualización (Nodo Logístico) */
+        /* Monitor de Datos */
         .main-content {
             flex: 1;
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
             background: var(--bg);
+            line-height: 1.6;
         }
 
-        .data-line { margin-bottom: 5px; border-left: 2px solid var(--accent); padding-left: 10px; }
+        .data-line { 
+            margin-bottom: 8px; 
+            border-left: 3px solid var(--accent); 
+            padding-left: 15px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
 
-        /* Consola de Comandos */
+        /* Consola Inferior */
         .footer-console {
             display: flex;
-            gap: 10px;
-            padding: 15px;
+            gap: 12px;
+            padding: 20px;
             background: var(--panel);
-            border-top: 1px solid #333;
+            border-top: 1px solid #222;
         }
 
         input {
             flex: 1;
             background: #000;
             color: var(--success);
-            border: 1px solid #444;
-            padding: 10px;
+            border: 1px solid #333;
+            padding: 12px;
+            font-family: inherit;
             outline: none;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px 25px;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            text-transform: uppercase;
+            transition: 0.2s;
         }
 
         .btn-exec { background: var(--accent); color: white; }
-        .btn-export { background: var(--success); color: black; }
-        
-        button:hover { opacity: 0.8; }
-    </style>
-</head>
-<body>
-
-    <div class="main-content" id="data-stream">
-        <div class="data-line">[SYSTEM STATUS] MOTOR V2: ONLINE</div>
-        <div class="data-line">[OWNER] RIBOT JONATAN - IP: REGISTERED 2025</div>
-    </div>
-
-    <div class="footer-console">
-        <input type="text" id="cmd-input" placeholder="Ingrese comando SLER..." onkeypress="if(event.key==='Enter') procesarSLER()">
-        
-        <button onclick="procesarSLER()" class="btn-exec">
-            EXECUTE
-        </button>
-        
-        <button onclick="generarSnapshotSLER()" class="btn-export">
-            EXPORTAR PNG
-        </button>
-    </div>
-
-    <script>
-        // Lógica de procesamiento (Nodo Logístico)
-        function procesarSLER() {
-            const input = document.getElementById('cmd-input');
-            const stream = document.getElementById('data-stream');
-            
-            if (input.value.trim() !== "") {
-                const newLine = document.createElement('div');
-                newLine.className = 'data-line';
-                newLine.textContent = `[PROCESS] ${new Date().toLocaleTimeString()}: ${input.value}`;
-                stream.appendChild(newLine);
-                
-                // Limpiar input y hacer scroll
-                input.value = "";
-                stream.scrollTop = stream.scrollHeight;
-            }
-        }
-
-        // Función de Aplanado para Formato Estable (Imagen)
-        function generarSnapshotSLER() {
-            const areaCaptura = document.getElementById('data-stream');
-            
-            console.log("Iniciando aplanado de imagen...");
-            
-            html2canvas(areaCaptura, {
-                backgroundColor: "#0a0a0c",
-                scale: 2 // Alta calidad foveal
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `SLER_V2_ESTABLE_${Date.now()}.png`;
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            }).catch(err => {
-                console.error("Error en la exportación:", err);
-            });
-        }
-    </script>
-</body>
-</html>
+        .btn-
