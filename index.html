@@ -2,77 +2,102 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SLER CHAT ENGINE - NODO PURO</title>
+    <title>CHAT SLER - ESCRITORIO PERSONAL</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         body, html { 
-            margin: 0; padding: 0; background: #000; 
-            font-family: 'Consolas', monospace; height: 100vh; 
-            display: flex; flex-direction: column; overflow: hidden;
+            margin: 0; padding: 0; background: #fff; 
+            font-family: 'Courier New', Courier, monospace; 
+            height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* El Canvas SLER: Espacio de lectura recíproca pura */
-        #sler-canvas {
-            flex: 1; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            background: #000; padding: 0 10%;
+        /* Barra Superior */
+        .header { 
+            background: #000; color: #fff; padding: 5px 20px; 
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; font-size: 14px;
         }
 
-        .sler-layout { width: 100%; display: flex; flex-direction: column; }
+        /* Cuerpo Principal */
+        .main-container { display: flex; flex: 1; border: 2px solid #000; }
 
-        .linea { 
-            font-size: 38px; font-weight: bold; 
-            margin: 5px 0; letter-spacing: 1px;
-            width: 100%;
-        }
+        /* Columna Izquierda: Contactos */
+        .sidebar-left { width: 200px; border-right: 2px solid #000; display: flex; flex-direction: column; }
+        .tab-header { background: #000; color: #fff; text-align: center; padding: 5px; font-size: 12px; }
+        .btn-contacto { border: 2px solid #000; margin: 5px; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; }
 
-        /* Línea Impar (M): Flujo hacia la derecha */
-        .m {
-            text-align: left; color: #00ffcc;
+        /* Área Central: Chat */
+        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .chat-display { 
+            flex: 1; padding: 20px; overflow-y: auto; line-height: 1.6;
+            font-size: 18px; text-align: justify;
         }
+        .input-box { border-top: 2px solid #000; padding: 15px; background: #eee; }
+        .input-field { border: 2px solid #000; width: 95%; padding: 10px; background: #fff; color: #999; }
 
-        /* Línea Par (C): Contraflujo desde la derecha */
-        /* Aplicando guion de advertencia inicial según regla 2026-01-23 */
-        .c {
-            text-align: right; color: #ffffff;
-        }
+        /* Columna Derecha: Datos/Acciones */
+        .sidebar-right { width: 180px; border-left: 2px solid #000; display: flex; flex-direction: column; }
+        .btn-accion { border: 2px solid #000; margin: 5px; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; }
 
-        .panel-control { 
-            background: #111; padding: 15px; text-align: center; 
-            border-top: 1px solid #333; 
-        }
+        /* Footer */
+        .footer-btns { display: flex; border-top: 2px solid #000; }
+        .f-btn { flex: 1; border-right: 2px solid #000; padding: 10px; text-align: center; font-weight: bold; cursor: pointer; }
 
-        button { 
-            padding: 12px 35px; font-size: 16px; cursor: pointer; 
-            background: #007acc; color: white; border: none; font-weight: bold;
-        }
+        /* Lógica SLER para el texto */
+        .sler-text { white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
-    <div id="sler-canvas">
-        <div class="sler-layout">
-            <div class="linea m">EL SISTEMA DE LECTURA ES RECÍPRO-</div>
-            <div class="linea c">-CO PORQUE LA LÍNEA PAR ADVIER-</div>
-            <div class="linea m">TE LA INCOMPLETITUD PSICOLÓGI-</div>
-            <div class="linea c">-CA QUE EL OJO DEBE COMPLETAR.</div>
+    <div class="header">
+        <span>CONTACTOS</span>
+        <span>ESCRITORIO PERSONAL - PRÁCTICA 60 CH</span>
+        <span>DATOS :</span>
+    </div>
+
+    <div class="main-container" id="capture-target">
+        <div class="sidebar-left">
+            <div class="btn-contacto">JONA</div>
+            <div class="btn-contacto">JONA</div>
+            <div class="btn-contacto">MARCOS</div>
+            <div style="flex:1"></div>
+            <div class="btn-contacto">SALIR</div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-display">
+                "La neurofisiología del aprendizaje requiere una sin- <br>
+                -lectu de sistema El !Atención; .perfecta cronización <br>
+                ra recíproca permite que el pensamiento se expanda. <br>
+                -completa de capacidad la extraordinaria es no Acaso¿ <br>
+                r fragmentos? Esta metodología antagonista desafía <br>
+                fluidez la Descubre; .tradicionales paradigmas los <br>
+                absoluta y transforma tu percepción cognitiva hoy mi- <br>
+                smo!"
+            </div>
+            <div class="input-box">
+                <div class="input-field">Escribe para practicar...</div>
+            </div>
+            <div class="footer-btns">
+                <div class="f-btn">VISTA SLER</div>
+                <div class="f-btn" onclick="descargarCaptura()">NORMAL</div>
+            </div>
+        </div>
+
+        <div class="sidebar-right">
+            <div class="btn-accion">TEST</div>
+            <div class="btn-accion">HOME</div>
+            <div class="btn-accion">AYUDA</div>
         </div>
     </div>
 
-    <div class="panel-control">
-        <button onclick="descargarChatSler()">DESCARGAR CHAT SLER</button>
-    </div>
-
     <script>
-        async function descargarChatSler() {
-            const area = document.getElementById('sler-canvas');
-            const canvas = await html2canvas(area, { 
-                backgroundColor: '#000',
-                scale: 2 
-            });
+        async function descargarCaptura() {
+            const node = document.getElementById('capture-target');
+            const canvas = await html2canvas(node);
             const link = document.createElement('a');
-            link.download = 'SLER_CHAT_PURO.png';
-            link.href = canvas.toDataURL('image/png');
+            link.download = 'CHAT_SLER_ESCRITORIO.png';
+            link.href = canvas.toDataURL();
             link.click();
         }
     </script>
