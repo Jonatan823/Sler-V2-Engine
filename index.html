@@ -2,34 +2,137 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SLER IDE v4.0 | NODO DE ESCUCHA AUTOMÁTICA</title>
+    <title>SLER IDE v5.5 | NODO BELL VILLE</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        :root { --bg: #0f0f12; --accent: #007acc; --turq: #00ffcc; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: #ccc; font-family: 'Consolas', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        .bar { background: #1a1a1f; padding: 10px 20px; border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; font-size: 12px; }
-        .main { display: flex; flex: 1; }
-        .left { width: 350px; border-right: 1px solid #333; display: flex; flex-direction: column; background: #1e1e1e; }
-        .terminal { flex: 1; background: #000; color: #0f0; padding: 15px; font-size: 11px; overflow-y: auto; border-top: 1px solid #333; }
-        .right { flex: 1; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; }
-        .sler-row { font-size: 28px; font-weight: bold; margin: 8px 0; width: 100%; max-width: 800px; }
-        .m { color: var(--turq); text-align: left; border-left: 6px solid var(--accent); padding-left: 20px; }
-        .c { color: #fff; text-align: right; border-right: 6px solid #ffca28; padding-right: 20px; }
-        button { padding: 15px; background: var(--accent); color: #fff; border: none; font-weight: bold; cursor: pointer; }
+        :root { --bg: #0c0c0e; --panel: #1a1a1f; --acc: #007acc; --cyan: #00ffcc; --gold: #ffca28; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #ccc; font-family: 'Consolas', monospace; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* HEADER TÉCNICO */
+        .header { background: #000; color: #fff; padding: 8px 20px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--acc); font-size: 12px; }
+        
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+
+        /* SIDEBAR DE CONTACTOS */
+        .sidebar { width: 220px; background: var(--panel); border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .tab-title { padding: 10px; background: #252526; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; text-align: center; }
+        .contact { padding: 12px 20px; border: 1px solid #444; margin: 5px; text-align: center; cursor: pointer; font-size: 13px; color: #fff; }
+        .contact:hover { border-color: var(--cyan); background: #222; }
+
+        /* EDITOR Y TERMINAL */
+        .editor-zone { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #333; }
+        textarea { flex: 1; background: #111; color: #666; border: none; padding: 20px; font-size: 14px; outline: none; resize: none; }
+        .terminal { height: 150px; background: #000; color: #0f0; padding: 15px; font-size: 11px; overflow-y: auto; border-top: 2px solid #333; }
+
+        /* MONITOR SLER CON FIRULETINES */
+        .monitor { width: 45%; background: #000; display: flex; flex-direction: column; }
+        #render-target { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px; background: #000; }
+        
+        .sler-row { font-size: 24px; font-weight: bold; margin: 6px 0; width: 100%; position: relative; }
+        /* Firuletín M (Turquesa) */
+        .m-line { text-align: left; color: var(--cyan); border-left: 6px solid var(--acc); padding-left: 15px; }
+        /* Firuletín C (Blanco/Oro) */
+        .c-line { text-align: right; color: #fff; border-right: 6px solid var(--gold); padding-right: 15px; }
+
+        /* BOTONERA */
+        .footer { background: var(--panel); padding: 15px; display: flex; justify-content: center; border-top: 1px solid #333; }
+        button { padding: 12px 30px; background: var(--acc); color: white; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        button:hover { background: #005fa3; }
     </style>
 </head>
 <body>
 
-    <div class="bar">
-        <span>ESTADO: <strong id="net-status">ESCUCHANDO PAQUETE...</strong></span>
+    <div class="header">
         <span>ID: BELL_VILLE_NODE_2026</span>
+        <span>SLER IDE v5.5 - SISTEMA DE LECTURA Y ESCRITURA RECÍPROCO</span>
+        <span>ESTADO: <span id="net-status" style="color:var(--gold)">BUSCANDO GIST...</span></span>
     </div>
 
-    <div class="main">
-        <div class="left">
-            <div style="padding:10px; font-size:10px; background:#2d2d2d;">BUFFER DE ENTRADA (RAW DATA)</div>
-            <div id="raw-display" style="padding:15px; font-size:13px; color:#666;">Esperando señal...</div>
-            <div class="terminal" id="log-term">[SYSTEM] Nodo Activo. Buscando paquetes en el canal de la IA...</div>
-            <button onclick="exportar()">DESCARGAR ENTREGA PARA IA</button>
+    <div class="workspace">
+        <div class="sidebar">
+            <div class="tab-title">USUARIOS</div>
+            <div class="contact">JONA</div>
+            <div class="contact">MARCOS</div>
+            <div style="flex:1"></div>
+            <div class="contact" style="color:#888; font-size:10px;">PROYECTO REGISTRADO © 2025</div>
         </div>
-        <div class="right" id="render-area
+
+        <div class="editor-zone">
+            <div class="tab-title">BUFFER DE ENTRADA (RAW DATA)</div>
+            <textarea id="ai-input" readonly>Esperando señal del Gist...</textarea>
+            <div class="terminal" id="term-log">
+                [INIT] Nodo Activo. Handshake inicial...
+            </div>
+        </div>
+
+        <div class="monitor">
+            <div class="tab-title">MONITOR DE SALIDA (FIRULETÍN ACTIVO)</div>
+            <div id="render-target"></div>
+            <div class="footer">
+                <button onclick="exportarImagen()">Descargar Entrega</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastId = "";
+        
+        // <<<< PEGA TU ENLACE 'CRUDO' (RAW) AQUÍ ABAJO >>>>
+        const GIST_URL = "https://gist.github.com/Jonatan823/a35889e38a68ae88c16ad749ec54df05/raw/b1cf921a9517a7d039386a19b9849c4b4454d678/package.json"; 
+
+        async function escuchar() {
+            const status = document.getElementById('net-status');
+            const term = document.getElementById('term-log');
+            if(GIST_URL.includes("TU_URL_RAW")) return;
+
+            try {
+                const res = await fetch(GIST_URL + '?nocache=' + new Date().getTime());
+                const data = await res.json();
+
+                if (data.id !== lastId) {
+                    lastId = data.id;
+                    document.getElementById('ai-input').value = data.text;
+                    term.innerHTML += `<br>[RECEIVED] Paquete: ${data.id}`;
+                    status.innerText = "CONECTADO";
+                    status.style.color = "#0f0";
+                    renderSler(data.text);
+                }
+            } catch (e) {
+                status.innerText = "ERROR DE VINCULACIÓN";
+            }
+        }
+
+        function renderSler(texto) {
+            const target = document.getElementById('render-target');
+            target.innerHTML = '';
+            const palabras = texto.split(' ');
+            let lineas = []; let buffer = "";
+
+            palabras.forEach(p => {
+                if ((buffer + p).length < 32) { buffer += p + " "; }
+                else { lineas.push(buffer.trim() + "-"); buffer = "-" + p + " "; }
+            });
+            lineas.push(buffer.trim());
+
+            lineas.forEach((l, i) => {
+                const div = document.createElement('div');
+                div.className = `sler-row ${i % 2 === 0 ? 'm-line' : 'c-line'}`;
+                div.innerText = l.toUpperCase();
+                target.appendChild(div);
+            });
+        }
+
+        async function exportarImagen() {
+            const node = document.getElementById('render-target');
+            const canvas = await html2canvas(node, { backgroundColor: '#000', scale: 2 });
+            const link = document.createElement('a');
+            link.download = 'PAQUETE_SLER_AUTÓNOMO.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        setInterval(escuchar, 5000);
+        escuchar();
+    </script>
+</body>
+</html>
