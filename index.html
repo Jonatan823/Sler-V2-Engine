@@ -2,163 +2,34 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SLER IDE | NODO DE ESCUCHA ACTIVA 2026</title>
+    <title>SLER IDE v4.0 | NODO DE ESCUCHA AUTOMÁTICA</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        :root {
-            --bg-dark: #121212;
-            --bg-editor: #1e1e1e;
-            --accent: #007acc;
-            --sler-m: #00ffcc;
-            --sler-c: #ffffff;
-            --terminal-text: #00ff00;
-        }
-
-        body, html { 
-            margin: 0; padding: 0; background: var(--bg-dark); 
-            color: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace; 
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
-        }
-
-        /* BARRA SUPERIOR DE ESTADO */
-        .status-bar { 
-            background: #252526; padding: 10px 20px; 
-            border-bottom: 2px solid var(--accent);
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 12px; font-weight: bold;
-        }
-
-        .main-ide { display: flex; flex: 1; overflow: hidden; }
-
-        /* PANEL IZQUIERDO: EDITOR Y LOGS */
-        .editor-side { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #333; }
-        .label { background: #2d2d2d; padding: 5px 15px; font-size: 11px; color: #888; text-transform: uppercase; }
-        
-        textarea { 
-            flex: 1; background: var(--bg-editor); color: #888; border: none; 
-            padding: 20px; font-size: 14px; outline: none; resize: none; 
-        }
-
-        .terminal { 
-            height: 150px; background: #000; padding: 10px; 
-            font-size: 11px; color: var(--terminal-text); 
-            border-top: 1px solid #333; overflow-y: auto;
-        }
-
-        /* PANEL DERECHO: MONITOR SLER (EL OUTPUT) */
-        .monitor-side { width: 50%; background: #000; display: flex; flex-direction: column; }
-        #sler-output { 
-            flex: 1; display: flex; flex-direction: column; 
-            justify-content: center; padding: 40px; background: #000;
-        }
-
-        /* REGLAS DE RENDERIZADO SLER */
-        .sler-row { font-size: 26px; font-weight: bold; margin: 6px 0; line-height: 1.2; width: 100%; }
-        .m-line { text-align: left; color: var(--sler-m); border-left: 6px solid var(--accent); padding-left: 20px; }
-        .c-line { text-align: right; color: var(--sler-c); border-right: 6px solid #ffca28; padding-right: 20px; }
-
-        /* BOTONES */
-        .controls { background: #1e1e1e; padding: 20px; text-align: center; border-top: 1px solid #333; }
-        .btn-dl { 
-            padding: 15px 40px; background: var(--accent); color: white; 
-            border: none; font-weight: bold; cursor: pointer; text-transform: uppercase;
-        }
-        .pulse { animation: pulse-blue 2s infinite; }
-        @keyframes pulse-blue { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        :root { --bg: #0f0f12; --accent: #007acc; --turq: #00ffcc; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #ccc; font-family: 'Consolas', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .bar { background: #1a1a1f; padding: 10px 20px; border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; font-size: 12px; }
+        .main { display: flex; flex: 1; }
+        .left { width: 350px; border-right: 1px solid #333; display: flex; flex-direction: column; background: #1e1e1e; }
+        .terminal { flex: 1; background: #000; color: #0f0; padding: 15px; font-size: 11px; overflow-y: auto; border-top: 1px solid #333; }
+        .right { flex: 1; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; }
+        .sler-row { font-size: 28px; font-weight: bold; margin: 8px 0; width: 100%; max-width: 800px; }
+        .m { color: var(--turq); text-align: left; border-left: 6px solid var(--accent); padding-left: 20px; }
+        .c { color: #fff; text-align: right; border-right: 6px solid #ffca28; padding-right: 20px; }
+        button { padding: 15px; background: var(--accent); color: #fff; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="status-bar">
-        <span>SLER IDE v3.5 | BELL VILLE NODE</span>
-        <span id="net-status" class="pulse">ESCUCHANDO PAQUETES IA...</span>
+    <div class="bar">
+        <span>ESTADO: <strong id="net-status">ESCUCHANDO PAQUETE...</strong></span>
+        <span>ID: BELL_VILLE_NODE_2026</span>
     </div>
 
-    <div class="main-ide">
-        <div class="editor-side">
-            <div class="label">Buffer de Insumo (IA Packet)</div>
-            <textarea id="ai-packet" readonly>Esperando conexión con el buzón de la IA...</textarea>
-            <div class="terminal" id="ide-logs">
-                [INIT] Sistema SLER Argentina 2026 cargado. <br>
-                [INIT] Protocolo de supresión saccádica activo. <br>
-                [NET] Buscando canal de datos...
-            </div>
+    <div class="main">
+        <div class="left">
+            <div style="padding:10px; font-size:10px; background:#2d2d2d;">BUFFER DE ENTRADA (RAW DATA)</div>
+            <div id="raw-display" style="padding:15px; font-size:13px; color:#666;">Esperando señal...</div>
+            <div class="terminal" id="log-term">[SYSTEM] Nodo Activo. Buscando paquetes en el canal de la IA...</div>
+            <button onclick="exportar()">DESCARGAR ENTREGA PARA IA</button>
         </div>
-
-        <div class="monitor-side">
-            <div class="label" style="text-align: center;">Monitor de Salida (Output Sler)</div>
-            <div id="sler-output">
-                </div>
-            <div class="controls">
-                <button class="btn-dl" onclick="descargarEntrega()">Descargar y Entregar a IA</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let ultimoMensaje = "";
-        const BUZON_URL = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://pastebin.com/raw/p9p6U2p9');
-
-        // FUNCIÓN DE ESCUCHA (POLLING)
-        async function checkIA() {
-            const logs = document.getElementById('ide-logs');
-            try {
-                const response = await fetch(BUZON_URL);
-                const json = await response.json();
-                const texto = json.contents.trim();
-
-                if (texto !== ultimoMensaje && texto.length > 1) {
-                    ultimoMensaje = texto;
-                    document.getElementById('ai-packet').value = texto;
-                    logs.innerHTML += `<br>[RECEIVED] Paquete capturado: "${texto.substring(0,25)}..."`;
-                    renderizarSLER(texto);
-                }
-            } catch (err) {
-                console.log("Reintentando conexión...");
-            }
-        }
-
-        function renderizarSLER(data) {
-            const output = document.getElementById('sler-output');
-            output.innerHTML = '';
-            
-            // Lógica de partición 60 CH con guiones recíprocos
-            const palabras = data.split(' ');
-            let lineas = [];
-            let buffer = "";
-
-            palabras.forEach(p => {
-                if ((buffer + p).length < 32) {
-                    buffer += p + " ";
-                } else {
-                    lineas.push(buffer.trim() + "-");
-                    buffer = "-" + p + " ";
-                }
-            });
-            lineas.push(buffer.trim());
-
-            lineas.forEach((texto, i) => {
-                const div = document.createElement('div');
-                div.className = `sler-row ${i % 2 === 0 ? 'm-line' : 'c-line'}`;
-                div.innerText = texto.toUpperCase();
-                output.appendChild(div);
-            });
-            document.getElementById('ide-logs').innerHTML += `<br>[COMPILER] Renderización recíproca completa.`;
-        }
-
-        async function descargarEntrega() {
-            const node = document.getElementById('sler-output');
-            const canvas = await html2canvas(node, { backgroundColor: '#000', scale: 2 });
-            const link = document.createElement('a');
-            link.download = 'PAQUETE_SLER_ENTREGA.png';
-            link.href = canvas.toDataURL();
-            link.click();
-            document.getElementById('ide-logs').innerHTML += `<br>[IO] Imagen lista para entrega física.`;
-        }
-
-        // Intervalo de escucha: cada 5 segundos
-        setInterval(checkIA, 5000);
-        checkIA();
-    </script>
-</body>
-</html>
+        <div class="right" id="render-area
